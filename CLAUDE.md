@@ -37,6 +37,13 @@ Estos conectores deben estar activos en la sesión:
   `outlook_calendar_search`, `find_meeting_availability`, `chat_message_search` (Teams),
   `sharepoint_search`, `sharepoint_folder_search`, `read_resource`.
 - **Web nativo:** `WebFetch`, `WebSearch` (solo HTML estático / público).
+- **Viajes/hoteles (MCP)** — para *rate shopping* de tarifas públicas (vista de cliente),
+  sin scraping. Referidos por su **nombre base** (el prefijo del servidor cambia por sesión):
+  - **Booking** → `accommodations_search` (precio exacto por hotel/fecha; respeta `currency`).
+  - **Trivago** → `trivago-search-suggestions`, `trivago-accommodation-search`,
+    `trivago-accommodation-radius-search` (metabuscador: precio **y canal/OTA** por hotel).
+  - **Tripadvisor** → `hotel_details`, `compare_hotels`, `search_hotels` (precio + reviews).
+  - **Expedia-like** → `search_hotels` (gateway).
 - **Canva** (MCP) — para gráficos/infografías de reportes.
 - **Microsoft Learn docs** (MCP) — para consultar documentación oficial al implementar.
 - **GitHub** (MCP) — operaciones de repositorio.
@@ -44,8 +51,9 @@ Estos conectores deben estar activos en la sesión:
 Scripts propios (en `scripts/`):
 
 - `crear-borrador.py` — crea correos como **BORRADOR** en Outlook vía Microsoft Graph.
-- `scrape-tarifas.py` — Playwright (sin login) para tarifas **públicas** de Booking/Expedia.
 - `generar-tabla.py` — openpyxl, arma Excel con formato desde un CSV.
+- `scrape-tarifas.py` — **respaldo** Playwright (sin login) para tarifas públicas de
+  Booking/Expedia, solo si los MCP de viajes no están disponibles en la sesión.
 
 ## Fuente de verdad: `config/`
 
@@ -63,7 +71,8 @@ No cablees datos en los Skills. Lee siempre de `config/`:
 - `triage-correo` — clasifica el correo de las últimas 24 h y sugiere respuestas.
 - `reporte-terceros` — arma un reporte y lo deja como **borrador** en Outlook (plantilla).
 - `descarga-web` — extrae datos de sitios públicos (deriva a Playwright si hay login/JS).
-- `tarifas-canales` — *rate shopping* público de Booking/Expedia → tabla comparativa.
+- `tarifas-canales` — *rate shopping* público vía MCP de viajes (Booking/Trivago/
+  Tripadvisor/Expedia) → tabla comparativa de tarifas y paridad por canal.
 
 ## Regla de oro (seguridad de acciones)
 

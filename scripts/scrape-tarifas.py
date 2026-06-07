@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
-"""Rate shopping de tarifas PÚBLICAS (vista de cliente) en Booking.com y Expedia.
+"""[RESPALDO] Rate shopping de tarifas PÚBLICAS en Booking.com y Expedia vía Playwright.
+
+NOTA: La vía PRINCIPAL de rate shopping son los conectores MCP de viajes
+(Booking/Trivago/Tripadvisor/Expedia) que usa el Skill tarifas-canales: dan datos
+estructurados, sin anti-bot ni problemas de ToS. Usa ESTE script solo como respaldo
+cuando ningún MCP de hoteles esté disponible en la sesión.
 
 Sin login, sin extranet: navega la página pública del hotel con Playwright y captura la
 tarifa que vería un huésped, para las fechas/ocupaciones de config/tarifas-publicas.yaml.
+Lee las URLs desde el campo 'plataformas' (booking/expedia) de cada hotel.
 Escribe un CSV en reports/YYYY-MM-DD-tarifas.csv.
 
 USO RESPONSABLE: estos sitios tienen detección de automatización (captcha, bloqueos,
@@ -143,10 +149,10 @@ def cargar_config(ruta: Path) -> dict:
     if not ruta.is_file():
         sys.exit(f"No se encontró el archivo de config: {ruta}")
     data = yaml.safe_load(ruta.read_text(encoding="utf-8")) or {}
-    if not data.get("hoteles"):
+    if not (data.get("hoteles_propios") or data.get("competidores")):
         sys.exit(
-            f"'{ruta}' no tiene hoteles configurados. Descomenta/agrega entradas en "
-            "'hoteles:' antes de ejecutar."
+            f"'{ruta}' no tiene hoteles configurados. Agrega entradas en "
+            "'hoteles_propios:' (con URLs en 'plataformas:') antes de ejecutar."
         )
     return data
 
@@ -161,8 +167,13 @@ def construir_filas(cfg: dict) -> list[dict]:
     hoy = datetime.now(TZ).date()
 
     builders = {"booking": url_booking, "expedia": url_expedia}
+    hoteles = [
+        {**h, "propio": True} for h in (cfg.get("hoteles_propios") or [])
+    ] + [
+        {**h, "propio": False} for h in (cfg.get("competidores") or [])
+    ]
     filas = []
-    for hotel in cfg["hoteles"]:
+    for hotel in hoteles:
         for plataforma, base in (hotel.get("plataformas") or {}).items():
             if not base or plataforma not in builders:
                 continue
