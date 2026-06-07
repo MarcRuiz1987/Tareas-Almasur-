@@ -1,0 +1,14 @@
+# Dependencias de los scripts del repo.
+# Instalar con: pip install -r scripts/requirements.txt
+# Para el scraper, además: playwright install chromium
+
+# crear-borrador.py (Microsoft Graph)
+msal>=1.28
+requests>=2.31
+
+# scrape-tarifas.py (rate shopping público)
+playwright>=1.44
+PyYAML>=6.0
+
+# generar-tabla.py (Excel)
+openpyxl>=3.1

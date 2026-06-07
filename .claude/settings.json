@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Bash(python3 scripts/scrape-tarifas.py:*)",
+      "Bash(python3 scripts/generar-tabla.py:*)",
+      "Bash(pip install -r scripts/requirements.txt)",
+      "Bash(playwright install chromium)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)"
+    ],
+    "ask": [
+      "Bash(python3 scripts/crear-borrador.py:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/verificar-conectores.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

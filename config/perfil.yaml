@@ -1,0 +1,26 @@
+# Perfil del usuario y la empresa. Fuente de verdad para los Skills.
+# Editar aquí (no en el código de los Skills).
+
+usuario:
+  nombre: "Marcelo Ruiz"
+  email: "Marcelo.ruiz@ialmasur.cl"
+  cargo: "Gerente Comercial y de Tecnología"
+  asana_gid: "1211035856165534"
+
+empresa:
+  nombre: "Inversiones Almasur"
+  web: "https://www.ialmasur.cl"
+  rubro: "Holding de rentas inmobiliarias"
+  unidades:
+    - "Almasur Hoteles (hotelería)"
+    - "Bluepark (estacionamientos)"
+    - "Procentro (bodegas industriales)"
+    - "Centro Metropolitano de Vehículos Retirados de Circulación (concesiones)"
+    - "Movilidad Urbana (concesiones / licitaciones)"
+    - "Multifamily (edificios)"
+    - "Rentas comerciales"
+
+salida:
+  idioma: "es-CL"            # español de Chile
+  zona_horaria: "America/Santiago"
+  moneda: "CLP"

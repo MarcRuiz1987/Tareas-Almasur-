@@ -1,0 +1,28 @@
+# Sitios web recurrentes de donde se descarga información.
+# PLANTILLA — completar con los sitios reales (ver Skill descarga-web).
+#
+# Reglas:
+#   - login: false  -> accesible con WebFetch/WebSearch (HTML estático/público).
+#   - login: true   -> requiere sesión; NO accesible por WebFetch. Derivar a un
+#                      script Playwright dedicado (patrón de scrape-tarifas.py).
+#   - js_pesado: true -> render dinámico; preferir Playwright aunque no tenga login.
+
+# Estructura de cada sitio:
+#   - id:        identificador corto y único
+#     nombre:    nombre legible
+#     url:       URL a consultar
+#     extraer:   qué dato(s) se quieren extraer (texto libre)
+#     login:     true | false
+#     js_pesado: true | false
+#     frecuencia: "diaria" | "semanal" | "a-demanda"
+
+sitios:
+  # --- EJEMPLO (comentado) -------------------------------------------------
+  # - id: ejemplo-publico
+  #   nombre: "Sitio público de ejemplo"
+  #   url: "https://www.ejemplo.cl/pagina"
+  #   extraer: "tabla de indicadores diarios"
+  #   login: false
+  #   js_pesado: false
+  #   frecuencia: "diaria"
+  # -------------------------------------------------------------------------

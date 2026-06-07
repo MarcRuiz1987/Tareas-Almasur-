@@ -1,0 +1,29 @@
+# Reportes a terceros: a quién, con qué asunto, formato y periodicidad.
+# PLANTILLA — completar cuando se definan los reportes (ver Skill reporte-terceros).
+# El Skill reporte-terceros lee esta lista para armar el borrador en Outlook.
+
+# Estructura de cada reporte:
+#   - id:           identificador corto y único (sin espacios)
+#     nombre:       nombre legible del reporte
+#     destinatarios:
+#       para:       ["correo1@...", "correo2@..."]
+#       cc:         ["correo3@..."]            # opcional
+#     asunto:       "Plantilla de asunto (se puede usar {fecha})"
+#     formato:      "html" | "markdown"        # cómo se redacta el cuerpo
+#     adjuntar_xlsx: true | false              # adjuntar tabla Excel generada
+#     frecuencia:   "diaria" | "semanal" | "mensual" | "a-demanda"
+#     fuente:       breve descripción de de dónde salen los datos (Asana, web, etc.)
+
+reportes:
+  # --- EJEMPLO (comentado) -------------------------------------------------
+  # - id: ventas-diario
+  #   nombre: "Informe diario de ventas / producción de reservas"
+  #   destinatarios:
+  #     para: ["gerencia@ialmasur.cl"]
+  #     cc: []
+  #   asunto: "Informe diario de ventas — {fecha}"
+  #   formato: "html"
+  #   adjuntar_xlsx: true
+  #   frecuencia: "diaria"
+  #   fuente: "Asana tarea 1215343240411641 + datos de canales"
+  # -------------------------------------------------------------------------

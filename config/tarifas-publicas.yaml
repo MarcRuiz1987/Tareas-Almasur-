@@ -1,0 +1,41 @@
+# Rate shopping: hoteles a monitorear en la vista PÚBLICA (de cliente) de
+# Booking.com y Expedia. Sin login, sin extranet. Lo lee scripts/scrape-tarifas.py
+# a través del Skill tarifas-canales.
+#
+# IMPORTANTE: usar de forma responsable y a baja frecuencia (ver README, sección
+# "Rate shopping").
+
+# Parámetros generales de las consultas
+consulta:
+  moneda: "CLP"
+  pais: "CL"
+  idioma: "es-CL"
+  # Horizonte de fechas a consultar (días desde hoy). El script genera un check-in
+  # por cada offset y un check-out = check-in + noches.
+  offsets_dias: [7, 30, 90]
+  noches: 1
+  ocupaciones:
+    - adultos: 2
+      ninos: 0
+      habitaciones: 1
+  # Pausa (segundos) entre consultas para no gatillar anti-bot.
+  pausa_segundos: 8
+  reintentos: 2
+
+# Hoteles a monitorear. Cada uno con su URL pública en cada plataforma.
+# Deja la URL vacía ("") si esa plataforma no aplica para ese hotel.
+hoteles:
+  # --- EJEMPLO (comentado) -------------------------------------------------
+  # - id: almasur-centro
+  #   nombre: "Almasur Hotel Centro"
+  #   propio: true
+  #   plataformas:
+  #     booking: "https://www.booking.com/hotel/cl/ejemplo.es.html"
+  #     expedia: "https://www.expedia.com/Hotel-Ejemplo.h123456.Hotel-Information"
+  # - id: competidor-1
+  #   nombre: "Hotel Competidor 1"
+  #   propio: false
+  #   plataformas:
+  #     booking: "https://www.booking.com/hotel/cl/competidor-1.es.html"
+  #     expedia: ""
+  # -------------------------------------------------------------------------

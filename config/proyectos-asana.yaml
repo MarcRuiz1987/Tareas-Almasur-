@@ -1,0 +1,42 @@
+# Proyectos de Asana relevantes para los reportes (GIDs reales).
+# El Skill reporte-matinal recorre estos proyectos para priorizar pendientes.
+# Para agregar/quitar un proyecto, edita esta lista.
+
+proyectos:
+  - nombre: "Almasur Tecnología"
+    gid: "1214878936144106"
+    area: "Tecnología"
+  - nombre: "Seguimiento Comercial Hoteles"
+    gid: "1215351136850104"
+    area: "Comercial"
+  - nombre: "Gerencia Comercial"
+    gid: "1214952858358924"
+    area: "Comercial"
+  - nombre: "Tareas hotel"
+    gid: "1215107084518646"
+    area: "Hotel"
+
+# Reportes recurrentes detectados entre las tareas del usuario.
+# Son candidatos de automatización (Skills reporte-terceros / tarifas-canales /
+# descarga-web). Se referencian por su GID de tarea de Asana.
+reportes_recurrentes:
+  - nombre: "Reporte diario de desayunos"
+    tarea_gid: "1215106869349946"
+  - nombre: "Informe diario de ventas / producción de reservas"
+    tarea_gid: "1215343240411641"
+  - nombre: "Reporte producción hoteles por vendedor"
+    tarea_gid: "1214877007072749"
+  - nombre: "Reporte producción hoteles por vendedor (2)"
+    tarea_gid: "1215351030515240"
+  - nombre: "Reporte de RN por país"
+    tarea_gid: "1215106869349963"
+  - nombre: "CHURN por negocio"
+    tarea_gid: "1215106869350005"
+  - nombre: "% adopción web check-in vs llegadas"
+    tarea_gid: "1214877006793750"
+  - nombre: "Gráfico diario: tarifas/ventas por canal"
+    tarea_gid: "1215069803217798"
+  - nombre: "Gráfico diario: reservas por canal"
+    tarea_gid: "1215069803217811"
+  - nombre: "Gráfico diario: ocupación proyectada"
+    tarea_gid: "1215106869349964"
