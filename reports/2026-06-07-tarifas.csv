@@ -1,0 +1,29 @@
+fuente,hotel,propio,canal,check_in,check_out,ocupacion,tarifa,moneda,tarifa_origen,moneda_origen,rating,url,estado
+booking,Almasur Providencia,si,Booking.com,2026-06-14,2026-06-15,2 ad / 1 hab,83506,CLP,CLP 83.506,CLP,,https://www.booking.com/hotel/cl/almasur-providencia.html,ok
+booking,Almasur Providencia,si,Booking.com,2026-07-07,2026-07-08,2 ad / 1 hab,125258,CLP,CLP 125.258,CLP,,https://www.booking.com/hotel/cl/almasur-providencia.html,ok
+booking,Almasur Providencia,si,Booking.com,2026-09-05,2026-09-06,2 ad / 1 hab,125258,CLP,CLP 125.258,CLP,,https://www.booking.com/hotel/cl/almasur-providencia.html,ok
+booking,Almasur Express Punta Arenas,si,Booking.com,2026-06-14,2026-06-15,2 ad / 1 hab,57410,CLP,CLP 57.410,CLP,,https://www.booking.com/hotel/cl/almasur-express-punta-arenas.html,ok
+trivago,Hotel Almasur Providencia,si,Hotel Site,2026-06-14,2026-06-15,2 ad / 1 hab,84920,CLP,EUR 88,EUR,9.6,,ok
+trivago,Four Points by Sheraton Santiago,no,Marriott Bonvoy,2026-06-14,2026-06-15,2 ad / 1 hab,74305,CLP,EUR 77,EUR,8.7,,ok
+trivago,Novotel Santiago Providencia,no,Novotel,2026-06-14,2026-06-15,2 ad / 1 hab,78165,CLP,EUR 81,EUR,9.0,,ok
+trivago,MR Express (ex Neruda Express),no,Trip.com,2026-06-14,2026-06-15,2 ad / 1 hab,79130,CLP,EUR 82,EUR,8.5,,ok
+trivago,Hotel Diego de Velazquez,no,Trip.com,2026-06-14,2026-06-15,2 ad / 1 hab,80095,CLP,EUR 83,EUR,8.3,,ok
+trivago,Hotel Nodo,no,trivago Book & Go,2026-06-14,2026-06-15,2 ad / 1 hab,81060,CLP,EUR 84,EUR,8.3,,ok
+trivago,NH Ciudad de Santiago,no,NH Hotels & Resorts,2026-06-14,2026-06-15,2 ad / 1 hab,83955,CLP,EUR 87,EUR,8.5,,ok
+trivago,Hotel Terrado Lyon,no,Agoda,2026-06-14,2026-06-15,2 ad / 1 hab,83955,CLP,EUR 87,EUR,8.0,,ok
+trivago,Pullman Santiago El Bosque,no,Pullman,2026-06-14,2026-06-15,2 ad / 1 hab,86850,CLP,EUR 90,EUR,8.9,,ok
+trivago,DoubleTree by Hilton Vitacura,no,trivago Book & Go,2026-06-14,2026-06-15,2 ad / 1 hab,89745,CLP,EUR 93,EUR,9.1,,ok
+trivago,Solace Hotel Santiago,no,trivago Book & Go,2026-06-14,2026-06-15,2 ad / 1 hab,93605,CLP,EUR 97,EUR,9.1,,ok
+trivago,hUB Providencia,no,Hotel Site,2026-06-14,2026-06-15,2 ad / 1 hab,94570,CLP,EUR 98,EUR,8.4,,ok
+trivago,Plaza El Bosque Ebro,no,Hotel Site,2026-06-14,2026-06-15,2 ad / 1 hab,95535,CLP,EUR 99,EUR,8.7,,ok
+trivago,Ola Providencia Tapestry by Hilton,no,trivago Book & Go,2026-06-14,2026-06-15,2 ad / 1 hab,98430,CLP,EUR 102,EUR,9.2,,ok
+trivago,Sheraton Santiago H&CC,no,Marriott Bonvoy,2026-06-14,2026-06-15,2 ad / 1 hab,104220,CLP,EUR 108,EUR,8.6,,ok
+trivago,Hyatt Centric Las Condes,no,Super.com,2026-06-14,2026-06-15,2 ad / 1 hab,115800,CLP,EUR 120,EUR,9.2,,ok
+trivago,Hotel Boutique Le Reve,no,Super.com,2026-06-14,2026-06-15,2 ad / 1 hab,116765,CLP,EUR 121,EUR,9.5,,ok
+trivago,AC Hotel Santiago Cenco Costanera,no,Marriott Bonvoy,2026-06-14,2026-06-15,2 ad / 1 hab,117730,CLP,EUR 122,EUR,9.1,,ok
+trivago,NH Collection Plaza Santiago,no,NH Collection,2026-06-14,2026-06-15,2 ad / 1 hab,127380,CLP,EUR 132,EUR,8.8,,ok
+trivago,Intercontinental Santiago by IHG,no,InterContinental,2026-06-14,2026-06-15,2 ad / 1 hab,136065,CLP,EUR 141,EUR,8.6,,ok
+trivago,W Santiago,no,W Hotels,2026-06-14,2026-06-15,2 ad / 1 hab,180455,CLP,EUR 187,EUR,8.8,,ok
+trivago,The Ritz-Carlton Santiago,no,The Ritz-Carlton,2026-06-14,2026-06-15,2 ad / 1 hab,250900,CLP,EUR 260,EUR,9.1,,ok
+trivago,Hotel Nogales by Tempo Rent,no,Expedia,2026-06-14,2026-06-15,2 ad / 1 hab,36670,CLP,EUR 38,EUR,6.9,,ok
+trivago,Tralkan B&B,no,Booking.com,2026-06-14,2026-06-15,2 ad / 1 hab,21230,CLP,EUR 22,EUR,7.0,,ok
