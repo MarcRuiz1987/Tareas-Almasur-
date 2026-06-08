@@ -1,58 +1,50 @@
 # Scrapling MCP — Setup para extracción de listas de clientes
 
+**Plataforma:** Windows  
 **Ejecución:** Manual (en tu máquina local)  
 **Librería:** [Scrapling by D4Vinci](https://github.com/D4Vinci/Scrapling) v0.4.9  
 **Objetivo:** Usar Scrapling como servidor MCP en Claude Desktop para sacar listas de clientes desde directorios web.
 
 ---
 
-## Estado de preparación (hecho en servidor remoto)
-
-| Paso | Estado | Notas |
-|------|--------|-------|
-| Python 3.11.15 | ✅ | Requiere 3.10+ |
-| uv 0.8.17 | ✅ | Gestor de paquetes |
-| `scrapling[all]` 0.4.9 | ✅ | Con playwright, patchright, curl-cffi |
-| Browsers (Playwright/Patchright) | ⚠️ | Requiere tu máquina local (ver Paso 3) |
-| Comando MCP confirmado | ✅ | `scrapling mcp` |
-| Config Claude Desktop | 📋 | Aplícala tú (ver Paso 5) |
-
----
-
-## Pasos a ejecutar en tu máquina local (macOS)
+## Pasos a ejecutar en tu máquina (Windows)
 
 ### Paso 1 — Verificar Python y uv
 
-```bash
-python3 --version   # Necesitas 3.10+
+Abre **PowerShell** (o CMD) y ejecuta:
+
+```powershell
+python --version   # Necesitas 3.10+
 uv --version
 ```
 
-Si falta Python 3.10+:
-```bash
-brew install python@3.11
+**Si falta Python 3.11+:**
+```powershell
+winget install Python.Python.3.11
 ```
+O descárgalo desde https://www.python.org/downloads/ (marca "Add to PATH" durante la instalación).
 
-Si falta uv:
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+**Si falta uv:**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
+Cierra y reabre PowerShell después de instalar uv.
 
 ---
 
 ### Paso 2 — Instalar Scrapling
 
-```bash
+```powershell
 uv pip install "scrapling[all]"
 ```
 
-O si no tienes venv activo:
-```bash
+Si da error de entorno virtual:
+```powershell
 uv pip install "scrapling[all]" --system
 ```
 
-Verifica la instalación:
-```bash
+Verifica:
+```powershell
 scrapling --version
 # Esperado: Scrapling, version 0.4.9
 ```
@@ -61,19 +53,12 @@ scrapling --version
 
 ### Paso 3 — Instalar navegadores
 
-Este paso **requiere tu máquina local** (el entorno remoto bloquea la descarga desde cdn.playwright.dev).
-
-```bash
+```powershell
 scrapling install
 ```
 
-Esto instala:
-- Chromium (vía Patchright — versión anti-detección)
-- Chromium (vía Playwright — estándar)
-- Camoufox (Firefox anti-fingerprint) si está disponible
-
-Si falla algún browser individualmente, puedes instalar solo el que necesitas:
-```bash
+Esto descarga e instala Chromium (Patchright + Playwright). Si falla alguno individualmente:
+```powershell
 python -m patchright install chromium
 python -m playwright install chromium
 ```
@@ -82,26 +67,39 @@ python -m playwright install chromium
 
 ### Paso 4 — Comando MCP confirmado
 
-El comando correcto (verificado en v0.4.9) es:
+El comando correcto (verificado en v0.4.9):
 
-```bash
-scrapling mcp          # stdio (para Claude Desktop)
-scrapling mcp --http   # HTTP stream (para uso remoto)
+```powershell
+scrapling mcp          # stdio — para Claude Desktop
+scrapling mcp --http   # HTTP stream — para uso remoto
 ```
 
-**No existe** `scrapling-mcp` como binario separado — todo va por `scrapling mcp`.
+No existe `scrapling-mcp.exe` separado — todo va por `scrapling mcp`.
 
 ---
 
 ### Paso 5 — Configurar Claude Desktop
 
-Abre o crea el archivo:
+La ubicación del archivo en Windows:
 ```
-~/Library/Application Support/Claude/claude_desktop_config.json
+%APPDATA%\Claude\claude_desktop_config.json
 ```
 
-**Si el archivo ya existe con otros MCPs**, agrega SOLO el bloque `"scrapling"` dentro de `"mcpServers"`:
+Para abrirlo rápido, pega esto en el Explorador de archivos o en Ejecutar (Win+R):
+```
+%APPDATA%\Claude\claude_desktop_config.json
+```
 
+Primero encuentra la ruta exacta de scrapling:
+```powershell
+where scrapling
+```
+Resultado típico en Windows:
+```
+C:\Users\TuUsuario\AppData\Local\Programs\Python\Python311\Scripts\scrapling.exe
+```
+
+**Contenido del archivo** (si no existe, créalo):
 ```json
 {
   "mcpServers": {
@@ -113,31 +111,25 @@ Abre o crea el archivo:
 }
 ```
 
-> Si `scrapling` no está en tu PATH, usa la ruta completa. Encuéntrala con:
-> ```bash
-> which scrapling
-> ```
-> Resultado típico en macOS: `/usr/local/bin/scrapling` o `/opt/homebrew/bin/scrapling`
-
-Con ruta absoluta:
+Si `scrapling` no está en PATH (el `where scrapling` no encontró nada), usa la ruta completa con barras invertidas escapadas:
 ```json
 {
   "mcpServers": {
     "scrapling": {
-      "command": "/usr/local/bin/scrapling",
+      "command": "C:\\Users\\TuUsuario\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\scrapling.exe",
       "args": ["mcp"]
     }
   }
 }
 ```
 
-Si ya tienes otros MCPs configurados, el archivo se vería así:
+**Si ya tienes otros MCPs configurados**, agrega solo el bloque `"scrapling"` dentro de `"mcpServers"`, sin tocar lo demás:
 ```json
 {
   "mcpServers": {
     "otro-mcp-existente": {
       "command": "...",
-      "args": [...]
+      "args": ["..."]
     },
     "scrapling": {
       "command": "scrapling",
@@ -151,18 +143,17 @@ Si ya tienes otros MCPs configurados, el archivo se vería así:
 
 ### Paso 6 — Probar extracción
 
-Prueba básica de funcionamiento (ejecutar en terminal):
+Crea un archivo `test_scrapling.py` y ejecútalo:
 
 ```python
-# test_scrapling.py
 from scrapling.fetchers import Fetcher, StealthyFetcher
 
-# Sin browser (rápido, curl-cffi)
+# Sin browser (rápido)
 page = Fetcher().get('https://es.wikipedia.org/wiki/Odontolog%C3%ADa')
 print('Status:', page.status)
 print('Título:', page.css('h1')[0].text)
 
-# Con browser stealth (más potente para sitios anti-bot)
+# Con browser stealth (para sitios anti-bot)
 page2 = StealthyFetcher().fetch(
     'https://www.doctoralia.com.mx/buscar?filters[0]=doctor&q=dentista&loc=Ciudad+de+Mexico',
     headless=True,
@@ -173,7 +164,7 @@ for n in nombres:
     print('-', n.text.strip())
 ```
 
-```bash
+```powershell
 python test_scrapling.py
 ```
 
@@ -181,10 +172,11 @@ python test_scrapling.py
 
 ### Paso 7 — Usar desde Claude Desktop
 
-1. **Reinicia Claude Desktop** completamente (Cmd+Q, no solo cerrar ventana)
-2. Abre una conversación nueva
-3. Verifica que el MCP aparece en la lista de herramientas disponibles
-4. Usa prompts como:
+1. **Cierra Claude Desktop completamente** (botón derecho en la bandeja del sistema → Salir)
+2. Vuelve a abrirlo
+3. Abre una conversación nueva
+4. El MCP de Scrapling aparecerá en las herramientas disponibles
+5. Prueba con un prompt como:
 
 ```
 Usa Scrapling para extraer los primeros 10 dentistas de CDMX 
@@ -193,20 +185,20 @@ desde Doctoralia. Dame: nombre, especialidad, dirección, teléfono.
 
 ---
 
-## Fetchers disponibles en Scrapling 0.4.9
+## Fetchers disponibles
 
 | Fetcher | Velocidad | Anti-bot | Requiere browser |
 |---------|-----------|----------|-----------------|
 | `Fetcher` | ⚡ Rápido | Básico (curl-cffi) | No |
-| `StealthyFetcher` | 🐢 Medio | Alto (Patchright) | Sí (Chromium) |
-| `DynamicFetcher` | 🐢 Medio | Estándar (Playwright) | Sí (Chromium) |
+| `StealthyFetcher` | Medio | Alto (Patchright/Chromium) | Sí |
+| `DynamicFetcher` | Medio | Estándar (Playwright) | Sí |
 
-Para listas de clientes desde directorios públicos: **`StealthyFetcher`** es la mejor opción.
+Para listas de clientes desde directorios: **`StealthyFetcher`** es la mejor opción.
 
 ---
 
-## Notas técnicas
+## Notas
 
-- Los buscadores (Google, Bing, DuckDuckGo) bloquean IPs de datacenter. En tu máquina local con IP residencial, el scraping de resultados de búsqueda funciona normalmente.
-- Scrapling 0.4.9 muestra warnings sobre `Fetcher.configure()` — son deprecation warnings, no errores. El código sigue funcionando.
-- Para scraping a escala, considera rotar User-Agents y añadir delays entre requests.
+- Scrapling 0.4.9 muestra warnings sobre `Fetcher.configure()` — son deprecation warnings, no errores.
+- Los buscadores (Google, Bing) pueden bloquear si haces muchas peticiones seguidas. Usa delays entre requests.
+- Si el MCP no aparece en Claude Desktop después de reiniciar, verifica que el JSON esté bien formado (sin comas extra, sin comillas simples).
