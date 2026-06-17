@@ -1,0 +1,18 @@
+# Secretos
+.env
+*.env
+
+# Caché del perfil ICP (datos de clientes)
+v2-leadgen/clients/icp_profile.json
+
+# Salidas generadas
+leads-*.csv
+leads-*.xlsx
+*.xlsx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
