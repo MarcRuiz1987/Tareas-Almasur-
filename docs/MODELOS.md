@@ -193,15 +193,32 @@ ni `mcp_server`.
 
 ---
 
-## 8. v1 vs v2 — cuándo usar cada una
+## 8. v1 vs v2 vs v3 — cuándo usar cada una
 
-| Criterio | v1 (scraping) | v2 (pago) |
-|---|---|---|
-| Costo | Gratis | APIs de pago |
-| Fiabilidad | Frágil (bloqueos/CAPTCHAs) | Alta (APIs oficiales) |
-| Email/teléfono | Baja cobertura (regex) | Verificado (Hunter + FullEnrich) |
-| Descripción de empresa | No | Sí |
-| Calificación de ajuste (ICP) | No | Sí, aprende de tus clientes |
-| Reproducibilidad | Baja | Alta |
+| Criterio | v1 (scraping) | v2 (pago) | v3 (completar planilla) |
+|---|---|---|---|
+| Punto de partida | Rubro + comuna | Rubro + comuna | Planilla con nombres de empresa |
+| Costo | Gratis | APIs de pago | APIs de pago (sólo las que uses) |
+| Fiabilidad | Frágil (bloqueos/CAPTCHAs) | Alta (APIs oficiales) | Alta (APIs oficiales) |
+| Email/teléfono | Baja cobertura (regex) | Verificado (Hunter + FullEnrich) | Verificado (Hunter + FullEnrich) |
+| RUT (Chile) | No | No | Sí (proveedor configurable) |
+| Descripción / ICP | No | Sí | No |
+| Reproducibilidad | Baja | Alta | Alta |
 
-Usa **v2** para trabajo real; **v1** para una exploración rápida sin claves.
+Usa **v3** cuando ya tienes la lista (p. ej. del SEIA) y sólo faltan datos; **v2** para descubrir
+empresas nuevas con descripción y calificación; **v1** para una exploración rápida sin claves.
+
+### v3 — completar planillas (`v3-enrich/`)
+
+Parte de una planilla `.xlsx`/`.csv` existente y **rellena sólo las celdas vacías**, columna a columna:
+
+- **RUT** (`rut.py`) — razón social → RUT vía un proveedor HTTP **configurable** (`RUT_API_URL` con el
+  marcador `{q}` y `RUT_API_JSON_PATH`). No hay una API pública única de *nombre → RUT* en Chile, por eso
+  se deja abierto a SimpleAPI / Boostr / LibreDTE u otro.
+- **Web / teléfono / dirección** (`lugar.py`) — Google Places Text Search, reutilizando el *field masking*
+  de la v2 pero resolviendo **una empresa conocida** en vez de buscar por rubro.
+- **Contactos** (`contactos.py`) — la misma cadena Hunter → FullEnrich de la v2, reducida a devolver el
+  **mejor contacto** por dominio.
+
+La detección de columnas (`sheet.py`) es tolerante a mayúsculas, acentos y alias (`config.ALIAS_COLUMNAS`);
+las columnas que faltan se crean con su encabezado canónico y nunca se borra nada existente. No usa LLM.
