@@ -202,6 +202,7 @@ ni `mcp_server`.
 | Fiabilidad | Frágil (bloqueos/CAPTCHAs) | Alta (APIs oficiales) | Alta (APIs oficiales) |
 | Email/teléfono | Baja cobertura (regex) | Verificado (Hunter + FullEnrich) | Verificado (Hunter + FullEnrich) |
 | RUT (Chile) | No | No | Sí (proveedor configurable) |
+| Titular + rep. legal (SEIA) | No | No | Sí (registro público, gratis) |
 | Descripción / ICP | No | Sí | No |
 | Reproducibilidad | Baja | Alta | Alta |
 
@@ -219,6 +220,13 @@ Parte de una planilla `.xlsx`/`.csv` existente y **rellena sólo las celdas vac�
   de la v2 pero resolviendo **una empresa conocida** en vez de buscar por rubro.
 - **Contactos** (`contactos.py`) — la misma cadena Hunter → FullEnrich de la v2, reducida a devolver el
   **mejor contacto** por dominio.
+- **SEIA** (`seia.py`) — **titular + representante legal con contacto** desde el registro público del SEA
+  (`--campos seia`). Es la **única fuente gratuita** de la v3 (no usa clave): busca el proyecto en el
+  buscador público del SEIA, elige la mejor coincidencia por razón social/comuna/fecha y lee de la ficha el
+  nombre, e-mail y teléfono del titular y de su representante legal. Útil porque los listados de partida de
+  la v3 suelen venir justamente del SEIA. Parsea HTML (BeautifulSoup) en ISO-8859-1 y envía el formulario en
+  esa misma codificación para que los nombres con tilde hagan match.
 
 La detección de columnas (`sheet.py`) es tolerante a mayúsculas, acentos y alias (`config.ALIAS_COLUMNAS`);
-las columnas que faltan se crean con su encabezado canónico y nunca se borra nada existente. No usa LLM.
+las columnas que faltan se crean con su encabezado canónico (`config.ENCABEZADOS_CANONICOS` para respetar
+siglas como "SEIA") y nunca se borra nada existente. No usa LLM.

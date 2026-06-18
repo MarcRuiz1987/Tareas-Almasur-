@@ -38,6 +38,13 @@ RUT_API_URL = os.getenv("RUT_API_URL", "")
 RUT_API_KEY = os.getenv("RUT_API_KEY", "")
 RUT_API_JSON_PATH = os.getenv("RUT_API_JSON_PATH", "rut")
 
+# SEIA (registro público de proyectos ambientales de Chile). No requiere clave.
+# Pausa opcional entre consultas para ser amable con el servidor del SEA.
+try:
+    SEIA_PAUSA_SEG = float(os.getenv("SEIA_PAUSA_SEG", "0.3"))
+except ValueError:
+    SEIA_PAUSA_SEG = 0.3
+
 # ─── Parámetros de descubrimiento (Google Places) ─────────────────────────────
 REGION_CODE = "cl"
 LANGUAGE_CODE = "es"
@@ -62,6 +69,27 @@ ALIAS_COLUMNAS: dict[str, list[str]] = {
     "email": ["email", "correo", "e-mail", "mail"],
     "telefono_contacto": ["telefono contacto", "teléfono contacto", "celular", "movil", "móvil", "mobile"],
     "linkedin": ["linkedin", "linkedin url", "linkedin_url"],
+    # SEIA — titular + representante legal con contacto (registro público)
+    "seia_titular": ["titular seia", "titular (seia)", "razon social seia"],
+    "seia_titular_email": ["email titular", "correo titular"],
+    "seia_titular_telefono": ["telefono titular", "teléfono titular"],
+    "seia_rep_legal": ["representante legal", "rep legal", "representante"],
+    "seia_rep_email": ["email representante legal", "email representante", "correo representante", "email rep legal"],
+    "seia_rep_telefono": ["telefono representante legal", "teléfono representante", "telefono rep legal"],
+    "seia_expediente": ["expediente seia", "ficha seia", "expediente"],
+}
+
+# Encabezado canónico para columnas que se crean si no existen. Si un campo no
+# aparece aquí, se usa el primer alias en mayúsculas de título (ver sheet.py).
+# Necesario para respetar la sigla "SEIA" y los acentos, que .title() destruiría.
+ENCABEZADOS_CANONICOS: dict[str, str] = {
+    "seia_titular": "Titular (SEIA)",
+    "seia_titular_email": "Email Titular",
+    "seia_titular_telefono": "Teléfono Titular",
+    "seia_rep_legal": "Representante Legal",
+    "seia_rep_email": "Email Representante Legal",
+    "seia_rep_telefono": "Teléfono Representante Legal",
+    "seia_expediente": "Expediente SEIA",
 }
 
 # Campos que se pueden completar y el grupo al que pertenecen (para --campos).
@@ -69,6 +97,15 @@ GRUPOS_CAMPOS: dict[str, list[str]] = {
     "rut": ["rut"],
     "web": ["sitio_web", "dominio", "telefono", "direccion"],
     "contactos": ["contacto", "cargo", "email", "telefono_contacto", "linkedin"],
+    "seia": [
+        "seia_titular",
+        "seia_titular_email",
+        "seia_titular_telefono",
+        "seia_rep_legal",
+        "seia_rep_email",
+        "seia_rep_telefono",
+        "seia_expediente",
+    ],
 }
 
 
@@ -84,6 +121,7 @@ def claves_disponibles() -> dict[str, bool]:
         "rut": bool(RUT_API_URL),
         "web": bool(GOOGLE_PLACES_API_KEY),
         "contactos": bool(HUNTER_API_KEY),
+        "seia": True,  # registro público: no necesita clave
     }
 
 

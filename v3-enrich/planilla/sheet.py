@@ -17,7 +17,7 @@ import csv
 import unicodedata
 from pathlib import Path
 
-from .config import ALIAS_COLUMNAS
+from .config import ALIAS_COLUMNAS, ENCABEZADOS_CANONICOS
 
 
 def _normalizar(texto: object) -> str:
@@ -117,7 +117,7 @@ class Planilla:
         """Devuelve el índice de la columna del campo; la crea si no existe."""
         if campo in self.mapa:
             return self.mapa[campo]
-        encabezado = ALIAS_COLUMNAS[campo][0].title()
+        encabezado = ENCABEZADOS_CANONICOS.get(campo) or ALIAS_COLUMNAS[campo][0].title()
         self.encabezados.append(encabezado)
         idx = len(self.encabezados) - 1
         for f in self.filas:

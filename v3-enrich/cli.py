@@ -51,7 +51,9 @@ def main() -> None:
     parser.add_argument(
         "--campos",
         default="web,contactos",
-        help="Grupos a completar, separados por coma: web, contactos, rut (por defecto: web,contactos)",
+        help="Grupos a completar, separados por coma: web, contactos, rut, seia "
+        "(por defecto: web,contactos). 'seia' trae titular + representante legal "
+        "con contacto desde el registro público del SEIA (sin clave de API).",
     )
     parser.add_argument("--limite", type=int, default=None, help="Máx. de filas a procesar")
     parser.add_argument("--sobrescribir", action="store_true", help="Reemplazar también celdas ya llenas")
@@ -93,6 +95,7 @@ def main() -> None:
     print(f"    Con RUT          : {res.con_rut}")
     print(f"    Con web/dominio  : {res.con_web}")
     print(f"    Con contacto     : {res.con_contacto}")
+    print(f"    Con datos SEIA   : {res.con_seia}")
 
 
 if __name__ == "__main__":

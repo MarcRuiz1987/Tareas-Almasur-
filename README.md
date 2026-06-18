@@ -13,6 +13,7 @@ El proyecto tiene **tres versiones que conviven** y se ejecutan de forma indepen
 | Descubrimiento | Scraping de Google Maps (Scrapling) | **Google Places API** (oficial, estable) | — (la lista ya existe) |
 | Contactos | Regex sobre el sitio + LinkedIn vía Google | **Hunter** (descubrir) → **FullEnrich** (email + teléfono) | **Hunter → FullEnrich** |
 | RUT (Chile) | ❌ | ❌ | ✅ proveedor configurable |
+| Titular + rep. legal (SEIA) | ❌ | ❌ | ✅ registro público (gratis, sin clave) |
 | Descripción de empresa | ❌ | ✅ **Claude** (Haiku) | ❌ |
 | Calificación ICP / ajuste | ❌ | ✅ **Claude** (Sonnet) con tus clientes como referencia | ❌ |
 | Costo | Gratis | APIs de pago (ver abajo) | APIs de pago (sólo las que uses) |
@@ -20,9 +21,9 @@ El proyecto tiene **tres versiones que conviven** y se ejecutan de forma indepen
 | Claves requeridas | Ninguna | Google Places, Hunter, FullEnrich, Anthropic | Google Places, Hunter, FullEnrich, RUT |
 
 **¿Cuál usar?** La **v3** cuando **ya tienes la lista de empresas** (p. ej. un listado del SEIA) y sólo
-necesitas **rellenar los datos que faltan** (RUT, web, contactos). La **v2** para descubrir empresas
-nuevas desde cero con descripción y calificación de ajuste. La **v1** como alternativa gratuita o para
-una exploración rápida sin claves.
+necesitas **rellenar los datos que faltan** (RUT, web, contactos y, gratis, el titular + representante
+legal del SEIA con su contacto). La **v2** para descubrir empresas nuevas desde cero con descripción y
+calificación de ajuste. La **v1** como alternativa gratuita o para una exploración rápida sin claves.
 
 ## Documentación
 

@@ -4,6 +4,7 @@ Para cada empresa (fila con nombre), y según los grupos de campos pedidos:
   - rut   → ``rut.buscar_rut``
   - web   → ``lugar.resolver`` (sitio web, dominio, teléfono, dirección)
   - contactos → ``contactos.mejor_contacto`` (nombre, cargo, email, tel, linkedin)
+  - seia  → ``seia.buscar`` (titular + representante legal con contacto, gratis)
 
 Sólo escribe en celdas vacías (salvo ``sobrescribir``). El dominio se necesita
 para los contactos: si la planilla no lo trae, se intenta obtener del grupo "web".
@@ -14,7 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import config, contactos, lugar, rut
+from . import config, contactos, lugar, rut, seia
 from .lugar import dominio_de_url
 from .sheet import Planilla
 
@@ -25,6 +26,7 @@ class Resumen:
     con_rut: int = 0
     con_web: int = 0
     con_contacto: int = 0
+    con_seia: int = 0
     celdas_escritas: int = 0
 
 
@@ -87,6 +89,23 @@ def completar_planilla(
             if necesita_dominio and pl.vacia(fila, "dominio"):
                 pl.set(fila, "dominio", ficha["dominio"], sobrescribir=False)
 
+        # ── SEIA: titular + representante legal con contacto (público) ────────
+        if "seia" in campos and any(
+            sobrescribir or pl.vacia(fila, c) for c in config.GRUPOS_CAMPOS["seia"]
+        ):
+            ficha = seia.buscar(nombre, comuna)
+            if ficha:
+                escritos = [
+                    pl.set(fila, "seia_titular", ficha.titular, sobrescribir),
+                    pl.set(fila, "seia_titular_email", ficha.titular_email, sobrescribir),
+                    pl.set(fila, "seia_titular_telefono", ficha.titular_telefono, sobrescribir),
+                    pl.set(fila, "seia_rep_legal", ficha.rep_legal, sobrescribir),
+                    pl.set(fila, "seia_rep_email", ficha.rep_email, sobrescribir),
+                    pl.set(fila, "seia_rep_telefono", ficha.rep_telefono, sobrescribir),
+                    pl.set(fila, "seia_expediente", ficha.expediente, sobrescribir),
+                ]
+                res.celdas_escritas += sum(escritos)
+
         # ── Contactos ────────────────────────────────────────────────────────
         if "contactos" in campos:
             dominio = str(pl.valor(fila, "dominio") or "").strip()
@@ -111,6 +130,8 @@ def completar_planilla(
             res.con_web += 1
         if not pl.vacia(fila, "email") or not pl.vacia(fila, "contacto"):
             res.con_contacto += 1
+        if not pl.vacia(fila, "seia_rep_legal") or not pl.vacia(fila, "seia_titular"):
+            res.con_seia += 1
 
     pl.guardar(salida)
     return res
