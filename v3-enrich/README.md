@@ -11,7 +11,7 @@ Mientras la **v2** *descubre* empresas desde cero (rubro + comuna), la **v3** pa
 |---|---|---|
 | `rut` | `RUT` | API de RUT chileno (configurable) |
 | `web` | `Sitio Web`, `Dominio`, `Teléfono`, `Dirección` | Google Places API |
-| `contactos` | `Contacto`, `Cargo`, `Email`, `Teléfono Contacto`, `LinkedIn` | Hunter → FullEnrich |
+| `contactos` | `Contacto`, `Cargo`, `Email`, `Teléfono Contacto`, `LinkedIn` | Hunter → FullEnrich (dominio desde la web o, si la empresa no tiene, desde el e-mail del SEIA) |
 | `seia` | `Titular (SEIA)`, `Email Titular`, `Teléfono Titular`, `Dirección Titular`, `Representante Legal`, `Email Representante Legal`, `Teléfono Representante Legal`, `Dirección Representante Legal`, `Expediente SEIA` | Registro público del SEIA (**sin clave de API**) |
 
 Reglas: **sólo rellena celdas vacías** (salvo `--sobrescribir`), **nunca borra** columnas ni filas,
@@ -60,6 +60,9 @@ python3 cli.py --entrada gtc_leads.xlsx --limite 10
 
 # correr sobre toda la planilla
 python3 cli.py --entrada gtc_leads.xlsx --salida gtc_leads_completa.xlsx
+
+# corridas largas: guardar cada N filas (reanudable si el entorno se interrumpe)
+python3 cli.py --entrada gtc_leads.xlsx --campos seia --checkpoint 20
 ```
 
 Por defecto completa **web + contactos**. Acepta `.xlsx` y `.csv`; hay una planilla de ejemplo en
@@ -68,6 +71,11 @@ adelante configuras un proveedor): `--campos web,contactos,rut`.
 
 Para traer el **titular y el representante legal con su contacto** desde el registro público del SEIA
 (no necesita ninguna clave): `--campos seia`. Se puede combinar: `--campos web,contactos,seia`.
+
+Con `--checkpoint N` la planilla se guarda cada N filas; como sólo se rellenan celdas vacías,
+re-correr sobre la salida **reanuda** donde quedó. Para empresas sin web propia (p. ej. las SPV de
+proyectos solares), `contactos` deriva el dominio del **e-mail publicado en el SEIA** (el del
+desarrollador madre) y busca ahí; y no vuelve a gastar una búsqueda en filas que ya tienen contacto.
 
 ## Claves de API (`.env`)
 

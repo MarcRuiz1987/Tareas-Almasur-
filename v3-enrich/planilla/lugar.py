@@ -7,6 +7,7 @@ orientado a **una empresa que ya conocemos** en lugar de a una búsqueda por rub
 
 from __future__ import annotations
 
+import re
 from urllib.parse import urlparse
 
 import requests
@@ -33,6 +34,31 @@ def dominio_de_url(url: str) -> str:
         return host[4:] if host.startswith("www.") else host
     except ValueError:
         return ""
+
+
+# Proveedores de correo personales: su dominio no sirve para buscar contactos
+# corporativos por dominio (Hunter), así que se descartan.
+_DOMINIOS_PERSONALES = {
+    "gmail.com", "googlemail.com", "hotmail.com", "hotmail.es", "outlook.com",
+    "outlook.es", "live.com", "yahoo.com", "yahoo.es", "icloud.com", "me.com",
+    "aol.com", "protonmail.com", "proton.me", "gmx.com",
+}
+
+
+def dominio_de_email(emails: str) -> str:
+    """Dominio corporativo del primer e-mail aprovechable de una cadena.
+
+    El SEIA suele traer varios correos separados por ';' o ','. Devuelve el
+    dominio del primero que no sea de un proveedor personal (gmail, hotmail…),
+    útil para enganchar al desarrollador madre de una SPV sin web propia
+    ("imena@orion-power.com" → "orion-power.com"). "" si no hay uno aprovechable.
+    """
+    for trozo in re.split(r"[;,\s]+", str(emails or "")):
+        if "@" in trozo:
+            dom = trozo.split("@", 1)[1].strip().lower().strip(".")
+            if dom and "." in dom and dom not in _DOMINIOS_PERSONALES:
+                return dom
+    return ""
 
 
 def resolver(nombre: str, comuna: str = "") -> dict:

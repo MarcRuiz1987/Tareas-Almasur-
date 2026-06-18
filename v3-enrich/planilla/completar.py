@@ -7,7 +7,8 @@ Para cada empresa (fila con nombre), y según los grupos de campos pedidos:
   - seia  → ``seia.buscar`` (titular + representante legal con contacto, gratis)
 
 Sólo escribe en celdas vacías (salvo ``sobrescribir``). El dominio se necesita
-para los contactos: si la planilla no lo trae, se intenta obtener del grupo "web".
+para los contactos: si la planilla no lo trae, se deriva del sitio web (Places)
+o del e-mail del SEIA (el del desarrollador madre de la SPV).
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import config, contactos, lugar, rut, seia
-from .lugar import dominio_de_url
+from .lugar import dominio_de_email, dominio_de_url
 from .sheet import Planilla
 
 
@@ -30,12 +31,30 @@ class Resumen:
     celdas_escritas: int = 0
 
 
+def _dominio_para_contactos(pl: Planilla, fila: list) -> str:
+    """Mejor dominio para buscar contactos: celda 'dominio' → sitio web → e-mail SEIA.
+
+    Para las SPV sin web propia, el dominio del desarrollador madre viene en el
+    e-mail del representante legal (o del titular) publicado en el SEIA.
+    """
+    dom = str(pl.valor(fila, "dominio") or "").strip()
+    if dom:
+        return dom
+    dom = dominio_de_url(str(pl.valor(fila, "sitio_web") or ""))
+    if dom:
+        return dom
+    return dominio_de_email(
+        str(pl.valor(fila, "seia_rep_email") or pl.valor(fila, "seia_titular_email") or "")
+    )
+
+
 def completar_planilla(
     entrada: str | Path,
     salida: str | Path,
     campos: set[str] | None = None,
     limite: int | None = None,
     sobrescribir: bool = False,
+    checkpoint_cada: int | None = None,
     progreso=print,
 ) -> Resumen:
     """Completa ``entrada`` y guarda el resultado en ``salida``.
@@ -44,6 +63,9 @@ def completar_planilla(
         campos: subconjunto de {"rut", "web", "contactos"} (por defecto todos).
         limite: nº máximo de filas a procesar (None = todas).
         sobrescribir: si True, reemplaza también celdas ya llenas.
+        checkpoint_cada: si se indica, guarda la planilla cada N filas (además
+            de al final), para no perder el avance ante una interrupción. Como
+            sólo se rellenan celdas vacías, re-correr sobre la salida reanuda.
     """
     campos = campos or set(config.GRUPOS_CAMPOS)
     pl = Planilla.cargar(entrada)
@@ -76,9 +98,12 @@ def completar_planilla(
             sobrescribir or pl.vacia(fila, c)
             for c in ("sitio_web", "dominio", "telefono", "direccion")
         )
-        # También resolvemos el lugar si hace falta el dominio para los contactos.
+        # Sólo recurrimos a Places por el dominio si no lo hay por otra vía
+        # (celda, sitio web o e-mail del SEIA) — así no gastamos búsquedas de más.
         necesita_dominio = (
-            "contactos" in campos and pl.vacia(fila, "dominio") and config.GOOGLE_PLACES_API_KEY
+            "contactos" in campos
+            and config.GOOGLE_PLACES_API_KEY
+            and not _dominio_para_contactos(pl, fila)
         )
         if necesita_web or necesita_dominio:
             ficha = lugar.resolver(nombre, comuna)
@@ -109,11 +134,15 @@ def completar_planilla(
                 res.celdas_escritas += sum(escritos)
 
         # ── Contactos ────────────────────────────────────────────────────────
-        if "contactos" in campos:
-            dominio = str(pl.valor(fila, "dominio") or "").strip()
-            if not dominio:
-                dominio = dominio_de_url(str(pl.valor(fila, "sitio_web") or ""))
+        # No gastar la búsqueda (de pago) si la fila ya trae un contacto: así
+        # re-correr —p. ej. tras un checkpoint— no vuelve a cobrar en Hunter.
+        ya_tiene_contacto = not pl.vacia(fila, "email") or not pl.vacia(fila, "contacto")
+        if "contactos" in campos and (sobrescribir or not ya_tiene_contacto):
+            dominio = _dominio_para_contactos(pl, fila)
             if dominio:
+                # Dejar el dominio en la planilla (trazabilidad), aunque venga del SEIA.
+                if pl.set(fila, "dominio", dominio, sobrescribir=False):
+                    res.celdas_escritas += 1
                 c = contactos.mejor_contacto(dominio, nombre)
                 if c:
                     escritos = [
@@ -134,6 +163,11 @@ def completar_planilla(
             res.con_contacto += 1
         if not pl.vacia(fila, "seia_rep_legal") or not pl.vacia(fila, "seia_titular"):
             res.con_seia += 1
+
+        # Guardado periódico: no perder el avance ante una interrupción.
+        if checkpoint_cada and n % checkpoint_cada == 0:
+            pl.guardar(salida)
+            progreso(f"    · checkpoint guardado ({n}/{total})")
 
     pl.guardar(salida)
     return res

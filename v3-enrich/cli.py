@@ -57,6 +57,10 @@ def main() -> None:
     )
     parser.add_argument("--limite", type=int, default=None, help="Máx. de filas a procesar")
     parser.add_argument("--sobrescribir", action="store_true", help="Reemplazar también celdas ya llenas")
+    parser.add_argument(
+        "--checkpoint", type=int, default=None, metavar="N",
+        help="Guardar la planilla cada N filas (reanudable si el proceso se interrumpe)",
+    )
     args = parser.parse_args()
 
     campos = {c.strip().lower() for c in args.campos.split(",") if c.strip()}
@@ -83,6 +87,7 @@ def main() -> None:
             campos=campos,
             limite=args.limite,
             sobrescribir=args.sobrescribir,
+            checkpoint_cada=args.checkpoint,
         )
     except (ValueError, FileNotFoundError) as e:
         print(f"✗ {e}")
