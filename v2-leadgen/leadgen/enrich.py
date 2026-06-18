@@ -74,6 +74,14 @@ class HunterProvider(ContactProvider):
 
 
 class FullEnrichProvider(ContactProvider):
+    # Endpoint bulk asíncrono. La ruta /api/v1 sigue vigente y responde con el
+    # contrato actual de FullEnrich; la /api/v2 existe pero cambia el envoltorio
+    # de la petición (espera "data" en vez de "datas"), así que usamos la v1.
+    # El contrato actual (verificado contra la API):
+    #   - enrich_fields usa nombres "contact.*" (no "contact_email"/"contact_phone").
+    #   - el POST devuelve {"enrichment_id": ...}.
+    #   - el polling GET /bulk/{id} devuelve {"status": "FINISHED"|"IN_PROGRESS"|...,
+    #     "datas": [{"contact": {...}}]} con los datos anidados bajo "contact".
     _BULK = "https://app.fullenrich.com/api/v1/contact/enrich/bulk"
 
     def disponible(self) -> bool:
@@ -107,7 +115,8 @@ class FullEnrichProvider(ContactProvider):
                     "domain": dominio,
                     "company_name": empresa,
                     "linkedin_url": c.linkedin_url or None,
-                    "enrich_fields": ["contact_email", "contact_phone"],
+                    # Nombres del contrato actual (la API rechaza "contact_email"/"contact_phone").
+                    "enrich_fields": ["contact.emails", "contact.phones"],
                 }
             )
             indices.append(i)
@@ -132,15 +141,21 @@ class FullEnrichProvider(ContactProvider):
         for pos, item in enumerate(resultado):
             if pos >= len(indices):
                 break
+            # Cada elemento de "datas" envuelve los datos bajo la clave "contact".
+            contact = item.get("contact", item) if isinstance(item, dict) else {}
             c = contactos[indices[pos]]
-            email = _primero(item, "contact_email", "email")
-            tel = _primero(item, "contact_phone", "phone", "mobile_phone")
+            email = _email_de_contacto(contact)
+            tel = _telefono_de_contacto(contact)
             if email:
                 c.email = email
                 c.confianza = max(c.confianza, 90)
             if tel:
                 c.telefono = tel
         return contactos
+
+    # Estados del job (la API responde en mayúsculas: FINISHED / IN_PROGRESS / ...).
+    _TERMINAL_OK = {"FINISHED"}
+    _TERMINAL_FALLO = {"CANCELED", "CANCELLED", "FAILED", "ERROR", "NO_CREDITS"}
 
     def _poll(self, enrichment_id: str, intentos: int = 20, espera: float = 6.0) -> list[dict]:
         url = f"{self._BULK}/{enrichment_id}"
@@ -151,20 +166,51 @@ class FullEnrichProvider(ContactProvider):
                 data = r.json()
             except requests.RequestException:
                 return []
-            if data.get("status") in ("FINISHED", "finished", "done"):
+            estado = str(data.get("status", "")).upper()
+            if estado in self._TERMINAL_OK:
                 return data.get("datas") or data.get("results") or []
+            if estado in self._TERMINAL_FALLO:
+                return []
             time.sleep(espera)
         return []
 
 
-def _primero(d: dict, *claves: str) -> str:
-    """Devuelve el primer valor no vacío entre varias posibles claves anidadas."""
-    for k in claves:
-        v = d.get(k)
-        if isinstance(v, dict):
-            v = v.get("value") or v.get("email") or v.get("number")
-        if v:
-            return str(v)
+def _valor(item) -> str:
+    """Normaliza a string un email/teléfono que puede venir como str o como dict."""
+    if isinstance(item, dict):
+        for k in ("email", "value", "address", "number", "phone", "e164"):
+            if item.get(k):
+                return str(item[k])
+        return ""
+    return str(item) if item else ""
+
+
+def _email_de_contacto(contact: dict) -> str:
+    """Mejor email del objeto ``contact`` de FullEnrich.
+
+    Prioriza ``most_probable_email`` (laboral) y cae a las listas ``emails`` /
+    ``personal_emails`` o al email personal más probable.
+    """
+    if contact.get("most_probable_email"):
+        return str(contact["most_probable_email"])
+    for lista in ("emails", "work_emails", "personal_emails"):
+        for item in contact.get(lista) or []:
+            email = _valor(item)
+            if email:
+                return email
+    if contact.get("most_probable_personal_email"):
+        return str(contact["most_probable_personal_email"])
+    return ""
+
+
+def _telefono_de_contacto(contact: dict) -> str:
+    """Mejor teléfono del objeto ``contact`` de FullEnrich."""
+    if contact.get("most_probable_phone"):
+        return str(contact["most_probable_phone"])
+    for item in contact.get("phones") or []:
+        tel = _valor(item)
+        if tel:
+            return tel
     return ""
 
 
