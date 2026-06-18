@@ -35,10 +35,11 @@ def _vacio(valor: object) -> bool:
 class Planilla:
     """Una planilla cargada en memoria, con mapeo campo_lógico → columna."""
 
-    def __init__(self, encabezados: list[str], filas: list[list], origen: Path):
+    def __init__(self, encabezados: list[str], filas: list[list], origen: Path, delimitador: str = ","):
         self.encabezados = encabezados
         self.filas = filas  # cada fila es una lista alineada con encabezados
         self.origen = origen
+        self.delimitador = delimitador  # separador del CSV (',' o ';'); se conserva al guardar
         self.mapa = self._mapear_columnas()
 
     # ─── Carga / guardado ────────────────────────────────────────────────────
@@ -46,13 +47,14 @@ class Planilla:
     @classmethod
     def cargar(cls, path: str | Path) -> "Planilla":
         path = Path(path)
+        delimitador = ","
         if path.suffix.lower() in (".xlsx", ".xlsm"):
             encabezados, filas = cls._leer_xlsx(path)
         elif path.suffix.lower() == ".csv":
-            encabezados, filas = cls._leer_csv(path)
+            encabezados, filas, delimitador = cls._leer_csv(path)
         else:
             raise ValueError(f"Formato no soportado: {path.suffix} (usa .xlsx o .csv)")
-        return cls(encabezados, filas, path)
+        return cls(encabezados, filas, path, delimitador)
 
     @staticmethod
     def _leer_xlsx(path: Path) -> tuple[list[str], list[list]]:
@@ -68,12 +70,28 @@ class Planilla:
         return encabezados, filas
 
     @staticmethod
-    def _leer_csv(path: Path) -> tuple[list[str], list[list]]:
+    def _detectar_delimitador(path: Path) -> str:
+        """Detecta el separador del CSV: ',' o ';' (común en Excel es-CL) o tab.
+
+        Excel en español exporta con ';' porque la coma es separador decimal; si
+        no lo detectáramos, toda la fila se leería como una sola columna.
+        """
         with open(path, newline="", encoding="utf-8-sig") as f:
-            lector = list(csv.reader(f))
+            muestra = f.readline()
+        try:
+            return csv.Sniffer().sniff(muestra, delimiters=",;\t").delimiter
+        except csv.Error:
+            # Respaldo: el separador más frecuente en la cabecera.
+            return max(",;\t", key=muestra.count) if muestra else ","
+
+    @classmethod
+    def _leer_csv(cls, path: Path) -> tuple[list[str], list[list], str]:
+        delim = cls._detectar_delimitador(path)
+        with open(path, newline="", encoding="utf-8-sig") as f:
+            lector = list(csv.reader(f, delimiter=delim))
         if not lector:
-            return [], []
-        return lector[0], lector[1:]
+            return [], [], delim
+        return lector[0], lector[1:], delim
 
     def guardar(self, path: str | Path) -> Path:
         path = Path(path)
@@ -93,7 +111,7 @@ class Planilla:
             wb.save(path)
         elif path.suffix.lower() == ".csv":
             with open(path, "w", newline="", encoding="utf-8-sig") as fh:
-                w = csv.writer(fh)
+                w = csv.writer(fh, delimiter=self.delimitador)
                 w.writerow(self.encabezados)
                 w.writerows([["" if c is None else c for c in f] for f in filas])
         else:
