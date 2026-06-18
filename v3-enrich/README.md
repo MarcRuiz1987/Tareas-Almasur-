@@ -17,25 +17,53 @@ Reglas: **sólo rellena celdas vacías** (salvo `--sobrescribir`), **nunca borra
 y **crea** las columnas que falten con su encabezado canónico. La detección de columnas tolera
 mayúsculas, acentos y nombres alternativos (`Empresa`/`Nombre`/`Razón social`, etc.).
 
-## Inicio rápido
+## Ejecutar en local (paso a paso)
 
+> El `.env` con tus claves **vive sólo en tu computador** — nunca se sube a GitHub (por eso, si lo
+> buscas en la web del repo, da 404: es lo esperado).
+
+### 1. Descargar el proyecto
+En la página del repo → botón verde **Code → Download ZIP**, descomprime y abre una terminal dentro
+de la carpeta. (O `git clone <url>` si usas git.)
+
+### 2. Instalar y crear el archivo de claves
+
+**macOS / Linux**
 ```bash
 cd v3-enrich
-pip install -r requirements.txt
-cp .env.example .env          # completa sólo las claves que vayas a usar
-
-# completar todo sobre una planilla del SEIA
-python cli.py --entrada gtc_leads.xlsx --salida gtc_leads_completa.xlsx
-
-# probar con las primeras 10 filas
-python cli.py --entrada gtc_leads.xlsx --limite 10
-
-# sólo web + contactos (sin RUT)
-python cli.py --entrada empresas.xlsx --campos web,contactos
+python3 -m pip install -r requirements.txt
+python3 cli.py --entrada ejemplo_planilla.csv   # crea el .env automáticamente y se detiene
 ```
 
-Hay una planilla de ejemplo en [`ejemplo_planilla.csv`](ejemplo_planilla.csv) con la misma
-estructura del SEIA. Acepta `.xlsx` y `.csv`.
+**Windows (PowerShell)**
+```powershell
+cd v3-enrich
+py -m pip install -r requirements.txt
+py cli.py --entrada ejemplo_planilla.csv        # crea el .env automáticamente y se detiene
+```
+
+La primera corrida crea el archivo `v3-enrich/.env` y te avisa. Ábrelo con cualquier editor de texto
+(Bloc de notas, TextEdit, VS Code…) y pega tus claves:
+
+```bash
+GOOGLE_PLACES_API_KEY=tu_clave
+HUNTER_API_KEY=tu_clave
+FULLENRICH_API_KEY=         # opcional
+```
+
+### 3. Completar tu planilla
+
+```bash
+# probar primero con 10 filas
+python3 cli.py --entrada gtc_leads.xlsx --limite 10
+
+# correr sobre toda la planilla
+python3 cli.py --entrada gtc_leads.xlsx --salida gtc_leads_completa.xlsx
+```
+
+Por defecto completa **web + contactos**. Acepta `.xlsx` y `.csv`; hay una planilla de ejemplo en
+[`ejemplo_planilla.csv`](ejemplo_planilla.csv) con la estructura del SEIA. Para incluir RUT (si más
+adelante configuras un proveedor): `--campos web,contactos,rut`.
 
 ## Claves de API (`.env`)
 

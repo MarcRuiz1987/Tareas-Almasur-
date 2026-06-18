@@ -19,20 +19,39 @@ La planilla debe tener al menos una columna de empresa ("Empresa" / "Nombre" /
 from __future__ import annotations
 
 import argparse
+import shutil
 from pathlib import Path
 
 from planilla import config
 from planilla.completar import completar_planilla
 
+_DIR = Path(__file__).resolve().parent
+
+
+def asegurar_env() -> bool:
+    """Crea .env desde .env.example la primera vez. Devuelve True si lo acaba de crear."""
+    env = _DIR / ".env"
+    ejemplo = _DIR / ".env.example"
+    if env.exists() or not ejemplo.exists():
+        return False
+    shutil.copy(ejemplo, env)
+    print(f"📝  Creé el archivo de claves: {env}")
+    print("    Ábrelo, pega tus claves (al menos GOOGLE_PLACES_API_KEY y HUNTER_API_KEY)")
+    print("    y vuelve a correr este comando.\n")
+    return True
+
 
 def main() -> None:
+    if asegurar_env():
+        return
+
     parser = argparse.ArgumentParser(description="Completar datos de una planilla de empresas (v3)")
     parser.add_argument("--entrada", required=True, help="Planilla de entrada (.xlsx o .csv)")
     parser.add_argument("--salida", default=None, help="Planilla de salida (por defecto: <entrada>_completa.xlsx)")
     parser.add_argument(
         "--campos",
-        default="rut,web,contactos",
-        help="Grupos a completar, separados por coma: rut, web, contactos (por defecto: todos)",
+        default="web,contactos",
+        help="Grupos a completar, separados por coma: web, contactos, rut (por defecto: web,contactos)",
     )
     parser.add_argument("--limite", type=int, default=None, help="Máx. de filas a procesar")
     parser.add_argument("--sobrescribir", action="store_true", help="Reemplazar también celdas ya llenas")

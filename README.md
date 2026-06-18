@@ -44,7 +44,7 @@ python cli.py --rubro logistica --comuna "Pudahuel, Santiago" --max 50 \
 ```bash
 cd v3-enrich
 pip install -r requirements.txt
-cp .env.example .env          # completa sólo las claves que uses
+python cli.py --entrada ejemplo_planilla.csv   # crea el .env la 1ª vez; pega tus claves y reintenta
 python cli.py --entrada gtc_leads.xlsx --salida gtc_leads_completa.xlsx
 ```
 
