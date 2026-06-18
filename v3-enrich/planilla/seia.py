@@ -145,18 +145,25 @@ def _elegir(filas: list[dict], nombre: str, comuna: str = "") -> dict | None:
 # ─── 2. Lectura de la ficha ───────────────────────────────────────────────────
 
 
+# Marcadores que el SEIA usa como "campo vacío" y que sólo ensucian la planilla
+# (p. ej. "SN"/"S/N" = sin número en teléfono/fax).
+_BASURA = {".", "-", "--", "sn", "s/n", "s.n", "na", "n/a", "no tiene", "0", "00"}
+
+
 def _valor_celda(div) -> str:
     """Texto de la celda-valor de la ficha: e-mail (mailto) o texto plano.
 
-    Descarta celdas sin contenido real (el SEIA a veces deja "." o "-" en
-    teléfono/fax), que ensuciarían la planilla.
+    Descarta celdas sin contenido real (sólo puntuación, o marcadores de "vacío"
+    como "." o "SN" que el SEIA deja en teléfono/fax).
     """
     a = div.find("a", href=True)
     if a and a["href"].lower().startswith("mailto:"):
         valor = _limpiar(a.get_text()) or _limpiar(a["href"][7:])
     else:
         valor = _limpiar(div.get_text())
-    return valor if re.search(r"[^\W_]", valor) else ""
+    if not re.search(r"[^\W_]", valor) or _norm(valor) in _BASURA:
+        return ""
+    return valor
 
 
 def _limpiar(texto: object) -> str:
