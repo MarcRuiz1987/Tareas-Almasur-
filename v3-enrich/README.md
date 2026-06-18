@@ -12,7 +12,7 @@ Mientras la **v2** *descubre* empresas desde cero (rubro + comuna), la **v3** pa
 | `rut` | `RUT` | API de RUT chileno (configurable) |
 | `web` | `Sitio Web`, `Dominio`, `Teléfono`, `Dirección` | Google Places API |
 | `contactos` | `Contacto`, `Cargo`, `Email`, `Teléfono Contacto`, `LinkedIn` | Hunter → FullEnrich |
-| `seia` | `Titular (SEIA)`, `Email Titular`, `Teléfono Titular`, `Representante Legal`, `Email Representante Legal`, `Teléfono Representante Legal`, `Expediente SEIA` | Registro público del SEIA (**sin clave de API**) |
+| `seia` | `Titular (SEIA)`, `Email Titular`, `Teléfono Titular`, `Dirección Titular`, `Representante Legal`, `Email Representante Legal`, `Teléfono Representante Legal`, `Dirección Representante Legal`, `Expediente SEIA` | Registro público del SEIA (**sin clave de API**) |
 
 Reglas: **sólo rellena celdas vacías** (salvo `--sobrescribir`), **nunca borra** columnas ni filas,
 y **crea** las columnas que falten con su encabezado canónico. La detección de columnas tolera

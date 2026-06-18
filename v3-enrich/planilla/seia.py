@@ -46,9 +46,11 @@ class FichaSEIA:
     titular: str = ""
     titular_email: str = ""
     titular_telefono: str = ""
+    titular_direccion: str = ""
     rep_legal: str = ""
     rep_email: str = ""
     rep_telefono: str = ""
+    rep_direccion: str = ""
     expediente: str = ""  # URL de la ficha (trazabilidad)
     expediente_nombre: str = ""
 
@@ -204,6 +206,20 @@ def _descargar_ficha(url: str) -> str:
         return ""
 
 
+def _direccion(seccion: dict[str, str]) -> str:
+    """Arma la dirección de una sección a partir de su domicilio y ciudad.
+
+    El SEIA separa "domicilio" (calle/número) y "ciudad"; los unimos en una sola
+    dirección útil para la planilla, sin repetir la ciudad si ya viene incluida en
+    el domicilio.
+    """
+    domicilio = _limpiar(seccion.get("domicilio"))
+    ciudad = _limpiar(seccion.get("ciudad"))
+    if ciudad and _norm(ciudad) not in _norm(domicilio):
+        return f"{domicilio}, {ciudad}".lstrip(", ") if domicilio else ciudad
+    return domicilio
+
+
 # ─── API pública ──────────────────────────────────────────────────────────────
 
 
@@ -239,9 +255,11 @@ def buscar(nombre: str, comuna: str = "") -> FichaSEIA | None:
         titular=titular.get("nombre") or _limpiar(exp.get("TITULAR")),
         titular_email=titular.get("e-mail", ""),
         titular_telefono=titular.get("telefono", ""),
+        titular_direccion=_direccion(titular),
         rep_legal=rep.get("nombre", ""),
         rep_email=rep.get("e-mail", ""),
         rep_telefono=rep.get("telefono", ""),
+        rep_direccion=_direccion(rep),
         expediente=url_ficha,
         expediente_nombre=_limpiar(exp.get("EXPEDIENTE_NOMBRE")),
     )

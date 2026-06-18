@@ -73,9 +73,11 @@ ALIAS_COLUMNAS: dict[str, list[str]] = {
     "seia_titular": ["titular seia", "titular (seia)", "razon social seia"],
     "seia_titular_email": ["email titular", "correo titular"],
     "seia_titular_telefono": ["telefono titular", "teléfono titular"],
+    "seia_titular_direccion": ["direccion titular", "dirección titular", "domicilio titular"],
     "seia_rep_legal": ["representante legal", "rep legal", "representante"],
     "seia_rep_email": ["email representante legal", "email representante", "correo representante", "email rep legal"],
     "seia_rep_telefono": ["telefono representante legal", "teléfono representante", "telefono rep legal"],
+    "seia_rep_direccion": ["direccion representante legal", "dirección representante legal", "domicilio representante legal", "direccion representante", "direccion rep legal"],
     "seia_expediente": ["expediente seia", "ficha seia", "expediente"],
 }
 
@@ -86,9 +88,11 @@ ENCABEZADOS_CANONICOS: dict[str, str] = {
     "seia_titular": "Titular (SEIA)",
     "seia_titular_email": "Email Titular",
     "seia_titular_telefono": "Teléfono Titular",
+    "seia_titular_direccion": "Dirección Titular",
     "seia_rep_legal": "Representante Legal",
     "seia_rep_email": "Email Representante Legal",
     "seia_rep_telefono": "Teléfono Representante Legal",
+    "seia_rep_direccion": "Dirección Representante Legal",
     "seia_expediente": "Expediente SEIA",
 }
 
@@ -101,9 +105,11 @@ GRUPOS_CAMPOS: dict[str, list[str]] = {
         "seia_titular",
         "seia_titular_email",
         "seia_titular_telefono",
+        "seia_titular_direccion",
         "seia_rep_legal",
         "seia_rep_email",
         "seia_rep_telefono",
+        "seia_rep_direccion",
         "seia_expediente",
     ],
 }

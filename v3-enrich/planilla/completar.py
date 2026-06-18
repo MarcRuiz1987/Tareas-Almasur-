@@ -99,9 +99,11 @@ def completar_planilla(
                     pl.set(fila, "seia_titular", ficha.titular, sobrescribir),
                     pl.set(fila, "seia_titular_email", ficha.titular_email, sobrescribir),
                     pl.set(fila, "seia_titular_telefono", ficha.titular_telefono, sobrescribir),
+                    pl.set(fila, "seia_titular_direccion", ficha.titular_direccion, sobrescribir),
                     pl.set(fila, "seia_rep_legal", ficha.rep_legal, sobrescribir),
                     pl.set(fila, "seia_rep_email", ficha.rep_email, sobrescribir),
                     pl.set(fila, "seia_rep_telefono", ficha.rep_telefono, sobrescribir),
+                    pl.set(fila, "seia_rep_direccion", ficha.rep_direccion, sobrescribir),
                     pl.set(fila, "seia_expediente", ficha.expediente, sobrescribir),
                 ]
                 res.celdas_escritas += sum(escritos)
