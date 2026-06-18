@@ -193,15 +193,40 @@ ni `mcp_server`.
 
 ---
 
-## 8. v1 vs v2 — cuándo usar cada una
+## 8. v1 vs v2 vs v3 — cuándo usar cada una
 
-| Criterio | v1 (scraping) | v2 (pago) |
-|---|---|---|
-| Costo | Gratis | APIs de pago |
-| Fiabilidad | Frágil (bloqueos/CAPTCHAs) | Alta (APIs oficiales) |
-| Email/teléfono | Baja cobertura (regex) | Verificado (Hunter + FullEnrich) |
-| Descripción de empresa | No | Sí |
-| Calificación de ajuste (ICP) | No | Sí, aprende de tus clientes |
-| Reproducibilidad | Baja | Alta |
+| Criterio | v1 (scraping) | v2 (pago) | v3 (completar planilla) |
+|---|---|---|---|
+| Punto de partida | Rubro + comuna | Rubro + comuna | Planilla con nombres de empresa |
+| Costo | Gratis | APIs de pago | APIs de pago (sólo las que uses) |
+| Fiabilidad | Frágil (bloqueos/CAPTCHAs) | Alta (APIs oficiales) | Alta (APIs oficiales) |
+| Email/teléfono | Baja cobertura (regex) | Verificado (Hunter + FullEnrich) | Verificado (Hunter + FullEnrich) |
+| RUT (Chile) | No | No | Sí (proveedor configurable) |
+| Titular + rep. legal (SEIA) | No | No | Sí (registro público, gratis) |
+| Descripción / ICP | No | Sí | No |
+| Reproducibilidad | Baja | Alta | Alta |
 
-Usa **v2** para trabajo real; **v1** para una exploración rápida sin claves.
+Usa **v3** cuando ya tienes la lista (p. ej. del SEIA) y sólo faltan datos; **v2** para descubrir
+empresas nuevas con descripción y calificación; **v1** para una exploración rápida sin claves.
+
+### v3 — completar planillas (`v3-enrich/`)
+
+Parte de una planilla `.xlsx`/`.csv` existente y **rellena sólo las celdas vacías**, columna a columna:
+
+- **RUT** (`rut.py`) — razón social → RUT vía un proveedor HTTP **configurable** (`RUT_API_URL` con el
+  marcador `{q}` y `RUT_API_JSON_PATH`). No hay una API pública única de *nombre → RUT* en Chile, por eso
+  se deja abierto a SimpleAPI / Boostr / LibreDTE u otro.
+- **Web / teléfono / dirección** (`lugar.py`) — Google Places Text Search, reutilizando el *field masking*
+  de la v2 pero resolviendo **una empresa conocida** en vez de buscar por rubro.
+- **Contactos** (`contactos.py`) — la misma cadena Hunter → FullEnrich de la v2, reducida a devolver el
+  **mejor contacto** por dominio.
+- **SEIA** (`seia.py`) — **titular + representante legal con contacto** desde el registro público del SEA
+  (`--campos seia`). Es la **única fuente gratuita** de la v3 (no usa clave): busca el proyecto en el
+  buscador público del SEIA, elige la mejor coincidencia por razón social/comuna/fecha y lee de la ficha el
+  nombre, e-mail y teléfono del titular y de su representante legal. Útil porque los listados de partida de
+  la v3 suelen venir justamente del SEIA. Parsea HTML (BeautifulSoup) en ISO-8859-1 y envía el formulario en
+  esa misma codificación para que los nombres con tilde hagan match.
+
+La detección de columnas (`sheet.py`) es tolerante a mayúsculas, acentos y alias (`config.ALIAS_COLUMNAS`);
+las columnas que faltan se crean con su encabezado canónico (`config.ENCABEZADOS_CANONICOS` para respetar
+siglas como "SEIA") y nunca se borra nada existente. No usa LLM.
